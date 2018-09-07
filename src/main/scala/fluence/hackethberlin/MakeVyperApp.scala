@@ -5,18 +5,20 @@ import types._
 
 object MakeVyperApp extends App {
 
-  val data = new DataDef(
-    ("address" → address) ::
-      ("owner" → `public`(address)) :: HNil
-  )
-
   val struct = new StructType(
-    "someStruct",
     ("address" → address) ::
       ("owner" → address) ::
       ("size" -> uint256) ::
       ("time" -> int128) :: HNil
   )
+
+  val data = new DataDef(
+    ("address" → address) ::
+      ("owner" → `public`(address)) ::
+      ("holders" → (address ~>> bool)) ::
+      ("struct" → `public`(struct)) :: HNil
+  )
+
 
   println(data.toVyper)
 

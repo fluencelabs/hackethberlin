@@ -1,12 +1,13 @@
 package fluence.hackethberlin.types
 
-import shapeless.{::, HList, HNil}
+import shapeless._
+import shapeless.tag._
 
 sealed trait DataVyper[T] {
   def toVyperDefinitions(data: T): List[String]
 }
 
-object DataVyper {
+sealed trait LowPriorityDataVyperImplicits {
 
   implicit object hnilDataVyper extends DataVyper[HNil] {
     override def toVyperDefinitions(data: HNil): List[String] = Nil
@@ -25,4 +26,24 @@ object DataVyper {
         s"$name: ${ttype.toVyper}" :: Nil
       }
     }
+}
+
+object DataVyper extends LowPriorityDataVyperImplicits {
+
+  implicit def pairDataPublicVyper[T <: Type]: DataVyper[(String, T @@ Public)] =
+    new DataVyper[(String, T @@ Public)] {
+      override def toVyperDefinitions(pair: (String, T @@ Public)): List[String] = {
+        val (name, ttype) = pair
+        s"$name: public(${ttype.toVyper})" :: Nil
+      }
+    }
+
+  implicit def pairDataIndexedVyper[T <: Type]: DataVyper[(String, T @@ Indexed)] =
+    new DataVyper[(String, T @@ Indexed)] {
+      override def toVyperDefinitions(pair: (String, T @@ Indexed)): List[String] = {
+        val (name, ttype) = pair
+        s"$name: indexed(${ttype.toVyper})" :: Nil
+      }
+    }
+
 }
