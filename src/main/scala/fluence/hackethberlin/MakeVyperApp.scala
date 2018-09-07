@@ -11,8 +11,11 @@ object MakeVyperApp extends App {
   )
 
   val struct = new StructType(
+    "someStruct",
     ("address" → address) ::
-      ("owner" → `public`(address)) :: HNil
+      ("owner" → address) ::
+      ("size" -> uint256) ::
+      ("time" -> int128) :: HNil
   )
 
   println(data.toVyper)

@@ -1,7 +1,7 @@
 package fluence.hackethberlin.types
 
-import shapeless.HList
+import shapeless.{HList, LUBConstraint}
 
-class StructType[D <: HList](dataDef: D)(implicit dv: DataVyper[D]) extends Type {
-  override def toVyper: String = s"{${dv.toVyperDefinitions(dataDef).mkString(", ")}}"
+class StructType[D <: HList](name: String, dataDef: D)(implicit dv: DataVyper[D], c: LUBConstraint[D, (String, PlainType)]) extends PlainType {
+  override def toVyper: String = s"$name: {${dv.toVyperDefinitions(dataDef).mkString(", ")}}"
 }
