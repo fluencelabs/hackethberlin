@@ -19,6 +19,7 @@ scalacOptions += "-Ypartial-unification"
 
 libraryDependencies ++= Seq(
   "org.typelevel"       %% "cats-core"   % "1.2.0",
+  "org.typelevel"       %% "cats-free"   % "1.2.0",
   "com.chuusai" %% "shapeless" % "2.3.3",
   "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
 )

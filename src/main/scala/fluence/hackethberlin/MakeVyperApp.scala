@@ -7,14 +7,14 @@ import syntax.singleton._
 
 object MakeVyperApp extends App {
 
-  val struct = new StructType(
+  val struct = ProductType(
     ('address ->> address) ::
       ('owner ->> address) ::
       ('size ->> uint256) ::
       ('time ->> int128) :: HNil
   )
 
-  val data = new DataDef(
+  val data = ProductType(
     ('address ->> address) ::
       ('owner ->> `public`(address)) ::
       ('holders ->> (address ~>> bool)) ::
@@ -29,7 +29,7 @@ object MakeVyperApp extends App {
     address
   )(args ⇒ args.ref('addr).toReturn)
 
-  val recordStruct = new StructType(
+  val recordStruct = ProductType(
     ('record_address ->> address) :: ('other_some ->> uint256) :: HNil
   )
 
@@ -37,7 +37,7 @@ object MakeVyperApp extends App {
 
   println(recordStruct.toVyper)
 
-  println(data.toVyper)
+  println(data.toDataVyper)
 
   println(func.toVyper)
 
