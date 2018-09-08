@@ -5,5 +5,8 @@ sealed trait Expr[T <: types.Type] {
 }
 
 object Expr {
-  case class Ref[T]()
+  case class Ref[T <: types.Type](name: String) extends Expr[T] {
+    override def toVyper(depth: Int): String =
+      ("  " * depth) + name
+  }
 }
