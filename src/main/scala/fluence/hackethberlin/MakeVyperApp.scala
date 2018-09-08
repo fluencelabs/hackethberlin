@@ -16,12 +16,11 @@ object MakeVyperApp extends App {
     ("address" → address) ::
       ("owner" → `public`(address)) ::
       ("holders" → (address ~>> bool)) ::
-      ("struct" → `public`(struct)) :: HNil
+      ("structMap" → `public`(Mapping(uint256, struct))) ::
+      ("struct" → `public`(struct)) ::
+      ("struct2" → struct) :: HNil
   )
 
-
   println(data.toVyper)
-
-  println(struct.toVyper)
 
 }
