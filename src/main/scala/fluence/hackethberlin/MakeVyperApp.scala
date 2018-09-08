@@ -1,9 +1,16 @@
 package fluence.hackethberlin
 
+import fluence.hackethberlin.types._
 import shapeless._
-import types._
-import Decorator._
-import fluence.hackethberlin.macrogen.ToVyper
+
+@ToVyper
+class MyContract(owner: String) {
+  val _owner: String = owner
+
+  def isOwner(addr: String): Boolean = {
+    _owner == owner
+  }
+}
 
 object MakeVyperApp extends App {
 
@@ -29,18 +36,12 @@ object MakeVyperApp extends App {
     uint256
   )
 
-  println(data.toVyper)
+//  println(data.toVyper)
+//
+//  println(func.toVyper)
+//
+//  println((`@public` @: func).toVyper)
 
-  println(func.toVyper)
-
-  println((`@public` @: func).toVyper)
-
-  @ToVyper
-  class MyContract(owner: String, smowner: Int) {
-    val _owner: String = owner
-
-    def isOwner(addr: String): Boolean = {
-      _owner == owner
-    }
-  }
+  println("WTF")
+  println(s"MYCONTRACT ${new MyContract("abc")}")
 }

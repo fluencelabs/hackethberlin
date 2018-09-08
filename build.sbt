@@ -17,9 +17,19 @@ scalafmtOnCompile := true
 // see good explanation https://gist.github.com/djspiewak/7a81a395c461fd3a09a6941d4cd040f2
 scalacOptions += "-Ypartial-unification"
 
+lazy val macro_impl = project.in(file("macro_impl")).settings(
+  libraryDependencies ++= Seq(
+    "org.typelevel"       %% "cats-core"   % "1.2.0",
+    "com.chuusai" %% "shapeless" % "2.3.3",
+    scalaVersion("org.scala-lang" % "scala-reflect" % _).value,
+    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
+  )
+)
+
+lazy val root = project.in(file(".")).aggregate(macro_impl).dependsOn(macro_impl)
+
 libraryDependencies ++= Seq(
   "org.typelevel"       %% "cats-core"   % "1.2.0",
   "com.chuusai" %% "shapeless" % "2.3.3",
-  "org.scalameta" %% "scalameta" % "3.7.4",
   "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
 )
