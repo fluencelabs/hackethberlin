@@ -59,4 +59,8 @@ object MakeVyperApp extends App {
     ).toVyper
   )
 
+  println(
+    func(recordStruct.ref('record_address) :: HNil).toVyper
+  )
+
 }

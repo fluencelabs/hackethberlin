@@ -9,7 +9,7 @@ sealed trait Expr[T] {
   def toVyper: String
 }
 
-sealed trait InlineExpr[T <: types.Type] extends Expr[T] {
+sealed trait InlineExpr[T] extends Expr[T] with Expr.ToInlineVyper {
   def toReturn: Free[Expr, T] = Free liftF Expr.Return[T](this)
 
   def :=:(name: Symbol): Free[Expr, Expr.Ref[T]] =
@@ -17,27 +17,33 @@ sealed trait InlineExpr[T <: types.Type] extends Expr[T] {
 }
 
 object Expr {
-  case class Ref[T <: types.Type](name: String, boxedValue: T) extends InlineExpr[T] {
-    override def toVyper: String = name
+  sealed trait ToInlineVyper {
+    def toInlineVyper: String
   }
 
-  case class Infix[L <: types.Type, R <: types.Type, T <: types.Type](
+  case class Ref[T](name: String, boxedValue: T) extends InlineExpr[T] {
+    override def toVyper: String = name
+    override def toInlineVyper: String = toVyper
+  }
+
+  case class Infix[L, R, T](
     op: String,
     left: InlineExpr[L],
     right: InlineExpr[R],
     boxedValue: T
   ) extends InlineExpr[T] {
     override def toVyper: String = left.toVyper + s" $op " + right.toVyper
+    override def toInlineVyper: String = toVyper
   }
 
-  case class Assign[T <: Type](ref: Ref[T], value: InlineExpr[T]) extends Expr[Ref[T]] {
+  case class Assign[T](ref: Ref[T], value: InlineExpr[T]) extends Expr[Ref[T]] {
     override def boxedValue: Ref[T] = ref
 
     override def toVyper: String =
       s"${ref.toVyper} = ${value.toVyper}"
   }
 
-  case class Return[T <: types.Type](ret: InlineExpr[T]) extends Expr[T] {
+  case class Return[T](ret: InlineExpr[T]) extends Expr[T] {
     override def boxedValue: T = ret.boxedValue
 
     override def toVyper: String =

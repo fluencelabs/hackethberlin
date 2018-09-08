@@ -4,7 +4,7 @@ import fluence.hackethberlin.types.{DataVyper, ProductType}
 import shapeless._
 import cats.free.Free
 
-class FuncDef[Args <: HList, Ret <: types.Type](
+class FuncDef[Args <: HList, Ret <: types.Type, Params <: HList](
   name: String,
   argsDef: ProductType[Args],
   ret: Ret,
@@ -20,25 +20,32 @@ class FuncDef[Args <: HList, Ret <: types.Type](
       .filter(_ != types.Void)
       .fold("")(" -> " + _.toVyper)}:\n$bodyVyper\n"
 
-  def @:(decorator: Decorator): FuncDef[Args, Ret] =
-    new FuncDef[Args, Ret](name, argsDef, ret, body, decorators + decorator)
+  def @:(decorator: Decorator): FuncDef[Args, Ret, Params] =
+    new FuncDef[Args, Ret, Params](name, argsDef, ret, body, decorators + decorator)
 
-  //def apply[Params <: HList](params: Params)(implicit a: LUBConstraint s: ops.hlist.Mapped[Args, InlineExpr]): InlineExpr[Ret] = ???
+  def apply(params: Params)(implicit toList: ops.hlist.ToList[Params, Expr.ToInlineVyper]): InlineExpr[Ret] =
+    Expr.Ref(toList.apply(params).map(_.toInlineVyper).mkString(s"$name(", ", ", ")"), ret)
 }
 
 object FuncDef {
 
-  def apply[Args <: HList: DataVyper, Ret <: types.Type](
+  def apply[Args <: HList: DataVyper, Ret <: types.Type, _Values <: HList](
     name: String,
     argsDef: Args,
     ret: Ret
-  )(body: ProductType[Args] ⇒ Free[Expr, Ret]): FuncDef[Args, Ret] =
+  )(body: ProductType[Args] ⇒ Free[Expr, Ret])(
+    implicit values: ops.record.Values.Aux[Args, _Values],
+    mapped: ops.hlist.Mapped[_Values, InlineExpr]
+  ): FuncDef[Args, Ret, mapped.Out] =
     new FuncDef(name, ProductType(argsDef), ret, body)
 
-  def apply[Args <: HList: DataVyper](
+  def apply[Args <: HList: DataVyper, _Values <: HList](
     name: String,
     argsDef: Args
-  )(body: ProductType[Args] ⇒ Free[Expr, Unit]): FuncDef[Args, types.Void] =
+  )(
+    body: ProductType[Args] ⇒ Free[Expr, Unit],
+    mapped: ops.hlist.Mapped[_Values, InlineExpr]
+  )(implicit values: ops.record.Values.Aux[Args, _Values]): FuncDef[Args, types.Void, mapped.Out] =
     new FuncDef(name, ProductType(argsDef), types.Void, args ⇒ body(args).map(_ ⇒ types.Void))
 
 }
