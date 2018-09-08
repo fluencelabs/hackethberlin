@@ -48,12 +48,12 @@ object MakeVyperApp extends App {
 
   val f = `@public` @:
     sumArgs.funcDef("sum", uint256) { args ⇒
-      for {
-        c ← 'c :=: `++`(args.ref('a), args.ref('b))
-        d ← 'd :=: `++`(args.ref('b), c)
-        sum ← `++`(args.ref('a), d).toReturn
-      } yield sum
-    }
+    for {
+      c ← 'c :=: `++`(args.ref('a), args.ref('b))
+      d ← 'd :=: `++`(args.ref('b), c)
+      sum ← `++`(args.ref('a), d).toReturn
+    } yield sum
+  }
 
   val all = recordStruct :: data :: func :: f :: HNil
 
