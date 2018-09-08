@@ -1,6 +1,7 @@
 package fluence.hackethberlin.types
 
 import shapeless._
+import shapeless.labelled.FieldType
 import shapeless.tag._
 
 sealed trait DataVyper[T] {
@@ -22,12 +23,10 @@ sealed trait LowPriorityDataVyperImplicits {
         dh.toVyperDefinitions(data.head) ::: dt.toVyperDefinitions(data.tail)
     }
 
-  implicit def pairDataVyper[T <: Type]: DataVyper[(String, T)] =
-    new DataVyper[(String, T)] {
-      override def toVyperDefinitions(pair: (String, T)): List[String] = {
-        val (name, ttype) = pair
-        s"$name: ${ttype.toVyper}" :: Nil
-      }
+  implicit def recDataVyper[K <: Symbol, V <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, V]] =
+    new DataVyper[FieldType[K, V]]{
+      override def toVyperDefinitions(data: FieldType[K, V]): List[String] =
+        s"${wk.value.name}: ${data.toVyper}" :: Nil
     }
 }
 
@@ -35,20 +34,16 @@ object DataVyper extends LowPriorityDataVyperImplicits {
 
   def apply[T](implicit dataVyper: DataVyper[T]): DataVyper[T] = dataVyper
 
-  implicit def pairDataPublicVyper[T <: Type]: DataVyper[(String, T @@ Public)] =
-    new DataVyper[(String, T @@ Public)] {
-      override def toVyperDefinitions(pair: (String, T @@ Public)): List[String] = {
-        val (name, ttype) = pair
-        s"$name: public(${ttype.toVyper})" :: Nil
-      }
+  implicit def pairDataIndexedVyper[K <: Symbol, T <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, T @@ Indexed]] =
+    new DataVyper[FieldType[K, T @@ Indexed]] {
+      override def toVyperDefinitions(data: FieldType[K, T @@ Indexed]): List[String] =
+        s"${wk.value.name}: indexed(${data.toVyper})" :: Nil
     }
 
-  implicit def pairDataIndexedVyper[T <: Type]: DataVyper[(String, T @@ Indexed)] =
-    new DataVyper[(String, T @@ Indexed)] {
-      override def toVyperDefinitions(pair: (String, T @@ Indexed)): List[String] = {
-        val (name, ttype) = pair
-        s"$name: indexed(${ttype.toVyper})" :: Nil
-      }
+  implicit def pairDataPublicVyper[K <: Symbol, T <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, T @@ Public]] =
+    new DataVyper[FieldType[K, T @@ Public]] {
+      override def toVyperDefinitions(data: FieldType[K, T @@ Public]): List[String] =
+        s"${wk.value.name}: public(${data.toVyper})" :: Nil
     }
 
 }
