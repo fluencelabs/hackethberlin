@@ -36,9 +36,9 @@ sealed trait LowPriorityDataVyperImplicits {
         data.toDataVyper :: Nil
     }
 
-  implicit def funcDefDataVyper[Args <: HList, Ret <: types.Type]: DataVyper[FuncDef[Args, Ret]] =
-    new DataVyper[FuncDef[Args, Ret]] {
-      override def toVyperDefinitions(func: FuncDef[Args, Ret]): List[String] =
+  implicit def funcDefDataVyper[Args <: HList, Ret <: types.Type, Params <: HList]: DataVyper[FuncDef[Args, Ret, Params]] =
+    new DataVyper[FuncDef[Args, Ret, Params]] {
+      override def toVyperDefinitions(func: FuncDef[Args, Ret, Params]): List[String] =
         func.toVyper :: Nil
     }
 
