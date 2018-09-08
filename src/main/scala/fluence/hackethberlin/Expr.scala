@@ -1,5 +1,6 @@
 package fluence.hackethberlin
 
+import cats.free.Free
 import types._
 
 sealed trait Expr[T] {
@@ -9,9 +10,10 @@ sealed trait Expr[T] {
 }
 
 sealed trait InlineExpr[T <: types.Type] extends Expr[T] {
-  def toReturn: Expr.Return[T] = Expr.Return[T](this)
+  def toReturn: Free[Expr, T] = Free liftF Expr.Return[T](this)
 
-  def :=:(name: Symbol): Expr[Expr.Ref[T]] = Expr.Assign[T](Expr.Ref[T](name.name, boxedValue), this)
+  def :=:(name: Symbol): Free[Expr, Expr.Ref[T]] =
+    Free.liftF[Expr, Expr.Ref[T]](Expr.Assign[T](Expr.Ref[T](name.name, boxedValue), this))
 }
 
 object Expr {

@@ -28,7 +28,7 @@ object MakeVyperApp extends App {
     "myFunc",
     ('addr ->> address) :: HNil,
     address
-  )(args ⇒ Free.liftF(args.ref('addr).toReturn))
+  )(args ⇒ args.ref('addr).toReturn)
 
   val recordStruct = ProductType(
     ('record_address ->> address) :: ('other_some ->> uint256) :: HNil
@@ -51,9 +51,9 @@ object MakeVyperApp extends App {
       `@public` @:
         sumArgs.funcDef("sum", uint256) { args ⇒
         for {
-          c ← Free.liftF('c :=: `++`(args.ref('a), args.ref('b)))
-          d ← Free.liftF('d :=: `++`(args.ref('b), c))
-          sum ← Free.liftF[Expr, uint256.type](`++`(args.ref('a), d).toReturn)
+          c ← 'c :=: `++`(args.ref('a), args.ref('b))
+          d ← 'd :=: `++`(args.ref('b), c)
+          sum ← `++`(args.ref('a), d).toReturn
         } yield sum
       }
     ).toVyper
