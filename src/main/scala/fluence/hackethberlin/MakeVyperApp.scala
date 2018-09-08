@@ -22,9 +22,10 @@ object MakeVyperApp extends App {
       ("struct2" → struct) :: HNil
   )
 
-  val func = new FuncDef(
+  val func = FuncDef(
     "myFunc",
-    ("address" → address) :: HNil
+    ("address" → address) :: HNil,
+    uint256
   )
 
   println(data.toVyper)
