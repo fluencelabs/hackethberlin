@@ -27,15 +27,6 @@ lazy val core = project.in(file("core")).settings(
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
-//lazy val core = project.in(file("core")).settings(
-//  libraryDependencies ++= Seq(
-//    "org.typelevel"       %% "cats-core"   % "1.2.0",
-//    "com.chuusai" %% "shapeless" % "2.3.3",
-//    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
-//  ),
-//  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
-//).dependsOn(macro_impl)
-
 lazy val root = project.in(file(".")).aggregate(core).dependsOn(core).settings(
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
