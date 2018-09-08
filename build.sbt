@@ -22,14 +22,20 @@ lazy val macro_impl = project.in(file("macro_impl")).settings(
     "org.typelevel"       %% "cats-core"   % "1.2.0",
     "com.chuusai" %% "shapeless" % "2.3.3",
     scalaVersion("org.scala-lang" % "scala-reflect" % _).value,
-    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
-  )
+    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test,
+  ),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
-lazy val root = project.in(file(".")).aggregate(macro_impl).dependsOn(macro_impl)
+lazy val core = project.in(file("core")).settings(
+  libraryDependencies ++= Seq(
+    "org.typelevel"       %% "cats-core"   % "1.2.0",
+    "com.chuusai" %% "shapeless" % "2.3.3",
+    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
+  ),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+).dependsOn(macro_impl)
 
-libraryDependencies ++= Seq(
-  "org.typelevel"       %% "cats-core"   % "1.2.0",
-  "com.chuusai" %% "shapeless" % "2.3.3",
-  "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
+lazy val root = project.in(file(".")).aggregate(macro_impl, core).dependsOn(macro_impl, core).settings(
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
