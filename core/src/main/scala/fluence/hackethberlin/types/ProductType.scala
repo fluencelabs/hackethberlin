@@ -23,7 +23,7 @@ class ProductType[D <: HList](dataDef: D, dv: DataVyper[D]) extends Type {
     dv.toVyperDefinitions(dataDef).mkString(", ")
 
   def funcDef[Ret <: Type](name: String, ret: Ret)(body: ProductType[D] ⇒ Free[Expr, Ret]): FuncDef[D, Ret] =
-    new FuncDef[D, Ret](name, this, Some(ret), body)
+    new FuncDef[D, Ret](name, this, ret, body)
 
 }
 

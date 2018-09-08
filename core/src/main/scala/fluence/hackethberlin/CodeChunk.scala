@@ -1,7 +1,7 @@
 package fluence.hackethberlin
 
 import cats.data.Writer
-import cats.{~>, Monad, Monoid}
+import cats.{~>, Monoid}
 
 import scala.collection.immutable.Queue
 

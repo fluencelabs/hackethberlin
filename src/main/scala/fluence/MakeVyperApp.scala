@@ -1,9 +1,9 @@
-package fluence.hackethberlin
+package fluence
 
+import hackethberlin._
+import hackethberlin.types._
 import shapeless._
-import types._
 import Decorator._
-import cats.free.Free
 import syntax.singleton._
 
 object MakeVyperApp extends App {
