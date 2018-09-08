@@ -51,6 +51,7 @@ object MakeVyperApp extends App {
     for {
       c ← 'c :=: `++`(args.ref('a), args.ref('b))
       d ← 'd :=: `++`(args.ref('b), c)
+      _ ← d :=: c
       sum ← `++`(args.ref('a), d).toReturn
     } yield sum
   }
@@ -65,5 +66,5 @@ object MakeVyperApp extends App {
     func(recordStruct.ref('record_address) :: HNil).toVyper
   )
 
-  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
+//  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
 }
