@@ -2,6 +2,7 @@ package fluence.hackethberlin
 
 import shapeless._
 import types._
+import Decorator._
 
 object MakeVyperApp extends App {
 
@@ -21,6 +22,15 @@ object MakeVyperApp extends App {
       ("struct2" → struct) :: HNil
   )
 
+  val func = new FuncDef(
+    "myFunc",
+    ("address" → address) :: HNil
+  )
+
   println(data.toVyper)
+
+  println(func.toVyper)
+
+  println((`@public` @: func).toVyper)
 
 }

@@ -13,7 +13,7 @@ startYear                 := Some(2018)
 licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 //headerLicense := Some(License.ALv2("2018", organizationName.value))
 resolvers += Resolver.bintrayRepo("fluencelabs", "releases")
-//scalafmtOnCompile := true,
+scalafmtOnCompile := true
 // see good explanation https://gist.github.com/djspiewak/7a81a395c461fd3a09a6941d4cd040f2
 scalacOptions += "-Ypartial-unification"
 

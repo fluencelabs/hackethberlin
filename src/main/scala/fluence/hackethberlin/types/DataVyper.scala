@@ -5,6 +5,9 @@ import shapeless.tag._
 
 sealed trait DataVyper[T] {
   def toVyperDefinitions(data: T): List[String]
+
+  def mkString(data: T, sep: String): String =
+    toVyperDefinitions(data).mkString(sep)
 }
 
 sealed trait LowPriorityDataVyperImplicits {
@@ -29,6 +32,8 @@ sealed trait LowPriorityDataVyperImplicits {
 }
 
 object DataVyper extends LowPriorityDataVyperImplicits {
+
+  def apply[T](implicit dataVyper: DataVyper[T]): DataVyper[T] = dataVyper
 
   implicit def pairDataPublicVyper[T <: Type]: DataVyper[(String, T @@ Public)] =
     new DataVyper[(String, T @@ Public)] {
