@@ -30,11 +30,17 @@ lazy val core = project.settings(
     "org.typelevel" %% "cats-core" % "1.2.0",
     "org.typelevel" %% "cats-free" % "1.2.0",
     "com.chuusai"   %% "shapeless" % "2.3.3",
-    "org.scalatest" %% "scalatest" % "3.0.5" % Test
-  )
+    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+    scalaVersion("org.scala-lang" % "scala-reflect" % _).value
+  ),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
 lazy val root = project
   .in(file("."))
   .dependsOn(core)
   .aggregate(core)
+  .settings(
+    libraryDependencies ++= Seq("com.chuusai"   %% "shapeless" % "2.3.3"),
+    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+  )
