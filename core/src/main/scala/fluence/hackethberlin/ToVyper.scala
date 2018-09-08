@@ -5,6 +5,10 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 import reflect.runtime.universe.ValDef
 import reflect.runtime.universe.Tree
+import fluence.hackethberlin.types.{PrimitiveType, _}
+
+import reflect.runtime.universe.{Liftable, Quasiquote}
+
 
 @compileTimeOnly("ToVyper is compileTimeOnly")
 class ToVyper extends StaticAnnotation {
@@ -13,30 +17,48 @@ class ToVyper extends StaticAnnotation {
 }
 
 object ToVyper {
-//  def mapParam(p: ValDef) = {
-//    s"${p.name}" -> s"${mapType(p.tpt)}"
-//  }
-//
-//  def mapType(t: Tree) = {
-//    t.toString match {
-//      case "String" => string
-//    }
-//  }
+  def mapParam(p: ValDef): (String, PrimitiveType) = {
+    p.name.toString -> mapType(p.tpt)
+  }
+
+  def mapType(t: Tree) = {
+    t.toString match {
+      case "String" => fluence.hackethberlin.types.address
+      case "Int" => fluence.hackethberlin.types.int128
+    }
+  }
+
+
 
   def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    import c.universe._
+    import c.universe.{Quasiquote, Tree => CTree}
 
     annottees.headOption.map(_.tree) match {
       case Some(q"$mods class $tpname $ctorMods(..$paramss) { ..$stats }") =>
         println(s"QUASI MATCHED \nmods $mods \ntpname $tpname \nctorMods $ctorMods \nparamss $paramss \nstats$stats")
 
+        implicit val liftPrimitive: c.universe.Liftable[PrimitiveType] = c.universe.Liftable[PrimitiveType] {
+          case `address` => q"_root_.fluence.hackethberlin.types.address"
+          case `bool` => q"_root_.fluence.hackethberlin.types.bool"
+          case `int128` => q"_root_.fluence.hackethberlin.types.int128"
+          case `uint256` => q"_root_.fluence.hackethberlin.types.uint256"
+          case `decimal` => q"_root_.fluence.hackethberlin.types.decimal"
+          case `string` => q"_root_.fluence.hackethberlin.types.string"
+        }
 
+        implicit val lift: c.universe.Liftable[(String, PrimitiveType)] = c.universe.Liftable[(String, PrimitiveType)] {
+          case (l, r) =>
+            q"($l -> $r)"
+        }
 
+        val params = paramss.map(p => mapParam(p.asInstanceOf[ValDef])).foldLeft[CTree](q"HNil")(
+          (acc, elem) => q"$elem :: $acc"
+        )
         c.Expr[Any](
           q"""
           class $tpname(..$paramss) {
             def toVyper = {
-              FuncDef("__init__", ("abc" -> string) :: HNil, uint256)
+              FuncDef("__init__", $params, uint256)
             }
           }
         """)

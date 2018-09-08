@@ -4,7 +4,7 @@ import fluence.hackethberlin.types._
 import shapeless._
 
 @ToVyper
-class MyContract(owner: String) {
+class MyContract(owner: String, friend: Int) {
   val _owner: String = owner
 
   def isOwner(addr: String): Boolean = {
@@ -42,5 +42,5 @@ object MakeVyperApp extends App {
 //
 //  println((`@public` @: func).toVyper)
 
-  println(s"MYCONTRACT ${new MyContract("abc").toVyper.toVyper}")
+  println(s"MYCONTRACT ${new MyContract("abc", 123).toVyper.toVyper}")
 }
