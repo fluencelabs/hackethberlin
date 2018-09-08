@@ -9,6 +9,7 @@ abstract sealed class PrimitiveType(name: String) extends Type {
 }
 
 object PrimitiveType {
+
   trait Defs {
     case object address extends PrimitiveType("address")
     case object bool extends PrimitiveType("bool")

@@ -3,6 +3,7 @@ package fluence.hackethberlin
 import shapeless._
 import types._
 import Decorator._
+import fluence.hackethberlin.macrogen.ToVyper
 
 object MakeVyperApp extends App {
 
@@ -34,4 +35,12 @@ object MakeVyperApp extends App {
 
   println((`@public` @: func).toVyper)
 
+  @ToVyper
+  class MyContract(owner: String, smowner: Int) {
+    val _owner: String = owner
+
+    def isOwner(addr: String): Boolean = {
+      _owner == owner
+    }
+  }
 }
