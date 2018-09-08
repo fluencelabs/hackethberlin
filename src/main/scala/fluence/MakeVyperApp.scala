@@ -46,18 +46,20 @@ object MakeVyperApp extends App {
 
   import Expr.Defs._
 
-  println(
-    (
-      `@public` @:
-        sumArgs.funcDef("sum", uint256) { args ⇒
-        for {
-          c ← 'c :=: `++`(args.ref('a), args.ref('b))
-          d ← 'd :=: `++`(args.ref('b), c)
-          sum ← `++`(args.ref('a), d).toReturn
-        } yield sum
-      }
-    ).toVyper
-  )
+  val f = `@public` @:
+    sumArgs.funcDef("sum", uint256) { args ⇒
+      for {
+        c ← 'c :=: `++`(args.ref('a), args.ref('b))
+        d ← 'd :=: `++`(args.ref('b), c)
+        sum ← `++`(args.ref('a), d).toReturn
+      } yield sum
+    }
+
+  val all = recordStruct :: data :: func :: f :: HNil
+
+  val c = new Contract(recordStruct :: struct :: data :: func :: f :: HNil)
+
+  println(c.toVyper)
 
   println(
     func(recordStruct.ref('record_address) :: HNil).toVyper

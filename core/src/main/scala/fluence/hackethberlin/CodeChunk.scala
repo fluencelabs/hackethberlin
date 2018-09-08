@@ -11,7 +11,7 @@ sealed trait CodeChunk {
 
 case class CodeBlock(lines: Queue[String]) extends CodeChunk {
   override def toVyper(indent: Int): String =
-    lines.mkString(CodeChunk.spaces(indent), ";\n" + CodeChunk.spaces(indent), ";\n")
+    lines.mkString(CodeChunk.spaces(indent), "\n" + CodeChunk.spaces(indent), "\n")
 }
 
 case class CodeLine(line: String) extends CodeChunk {

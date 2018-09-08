@@ -1,5 +1,6 @@
 package fluence.hackethberlin.types
 
+import fluence.hackethberlin.{FuncDef, types}
 import shapeless._
 import shapeless.labelled.FieldType
 import shapeless.tag._
@@ -28,6 +29,19 @@ sealed trait LowPriorityDataVyperImplicits {
       override def toVyperDefinitions(data: FieldType[K, V]): List[String] =
         s"${wk.value.name}: ${data.toVyper}" :: Nil
     }
+
+  implicit def productTypeDataVyper[D <: HList]: DataVyper[ProductType[D]] =
+    new DataVyper[ProductType[D]] {
+      override def toVyperDefinitions(data: ProductType[D]): List[String] =
+        data.toDataVyper :: Nil
+    }
+
+  implicit def funcDefDataVyper[Args <: HList, Ret <: types.Type]: DataVyper[FuncDef[Args, Ret]] =
+    new DataVyper[FuncDef[Args, Ret]] {
+      override def toVyperDefinitions(func: FuncDef[Args, Ret]): List[String] =
+        func.toVyper :: Nil
+    }
+
 }
 
 object DataVyper extends LowPriorityDataVyperImplicits {
