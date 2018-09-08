@@ -65,4 +65,5 @@ object MakeVyperApp extends App {
     func(recordStruct.ref('record_address) :: HNil).toVyper
   )
 
+  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
 }

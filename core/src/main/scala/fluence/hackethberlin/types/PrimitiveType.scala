@@ -16,5 +16,6 @@ object PrimitiveType {
     case object int128 extends PrimitiveType("int128")
     case object uint256 extends PrimitiveType("uint256")
     case object decimal extends PrimitiveType("decimal")
+    case object string extends PrimitiveType("string")
   }
 }
