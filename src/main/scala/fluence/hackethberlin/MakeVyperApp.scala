@@ -16,7 +16,7 @@ object MakeVyperApp extends App {
     ("address" → address) ::
       ("owner" → `public`(address)) ::
       ("holders" → (address ~>> bool)) ::
-      ("structMap" → `public`(Mapping(uint256, struct))) ::
+      ("structMap" → `public`(uint256 ~>> struct)) ::
       ("struct" → `public`(struct)) ::
       ("struct2" → struct) :: HNil
   )

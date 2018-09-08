@@ -1,6 +1,6 @@
 package fluence.hackethberlin.types
 
-abstract sealed class PrimitiveType(name: String) extends PlainType {
+abstract sealed class PrimitiveType(name: String) extends Type {
   self ⇒
 
   override def toVyper: String = name
