@@ -17,7 +17,7 @@ scalafmtOnCompile := true
 // see good explanation https://gist.github.com/djspiewak/7a81a395c461fd3a09a6941d4cd040f2
 scalacOptions += "-Ypartial-unification"
 
-lazy val macro_impl = project.in(file("macro_impl")).settings(
+lazy val core = project.in(file("core")).settings(
   libraryDependencies ++= Seq(
     "org.typelevel"       %% "cats-core"   % "1.2.0",
     "com.chuusai" %% "shapeless" % "2.3.3",
@@ -27,15 +27,15 @@ lazy val macro_impl = project.in(file("macro_impl")).settings(
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
-lazy val core = project.in(file("core")).settings(
-  libraryDependencies ++= Seq(
-    "org.typelevel"       %% "cats-core"   % "1.2.0",
-    "com.chuusai" %% "shapeless" % "2.3.3",
-    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
-  ),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
-).dependsOn(macro_impl)
+//lazy val core = project.in(file("core")).settings(
+//  libraryDependencies ++= Seq(
+//    "org.typelevel"       %% "cats-core"   % "1.2.0",
+//    "com.chuusai" %% "shapeless" % "2.3.3",
+//    "org.scalatest" %% "scalatest"   % "3.0.5"  % Test
+//  ),
+//  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+//).dependsOn(macro_impl)
 
-lazy val root = project.in(file(".")).aggregate(macro_impl, core).dependsOn(macro_impl, core).settings(
+lazy val root = project.in(file(".")).aggregate(core).dependsOn(core).settings(
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )

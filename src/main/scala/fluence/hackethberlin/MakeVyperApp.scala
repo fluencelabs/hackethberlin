@@ -42,6 +42,5 @@ object MakeVyperApp extends App {
 //
 //  println((`@public` @: func).toVyper)
 
-  println("WTF")
   println(s"MYCONTRACT ${new MyContract("abc").toVyper.toVyper}")
 }
