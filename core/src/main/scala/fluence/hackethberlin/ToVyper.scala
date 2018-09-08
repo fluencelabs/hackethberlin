@@ -51,8 +51,8 @@ object ToVyper {
             q"($l -> $r)"
         }
 
-        val params = paramss.map(p => mapParam(p.asInstanceOf[ValDef])).foldLeft[CTree](q"HNil")(
-          (acc, elem) => q"$elem :: $acc"
+        val params = paramss.map(p => mapParam(p.asInstanceOf[ValDef])).foldRight[CTree](q"HNil")(
+          (elem, acc) => q"$elem :: $acc"
         )
         c.Expr[Any](
           q"""
