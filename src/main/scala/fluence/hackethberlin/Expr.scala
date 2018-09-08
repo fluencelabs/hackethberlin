@@ -1,27 +1,53 @@
 package fluence.hackethberlin
 
-sealed trait Expr[T <: types.Type] {
-  def toVyper(depth: Int): String
+import types._
 
-  protected def spaces(depth: Int): String = "  " * depth
+sealed trait Expr[T] {
+  def boxedValue: T
+
+  def toVyper: String
 }
 
-sealed trait InlineExpr[T <: types.Type] extends Expr[T]{
-  override def toVyper(depth: Int): String = spaces(depth) + toInlineVyper
-
-  def toInlineVyper: String
-
+sealed trait InlineExpr[T <: types.Type] extends Expr[T] {
   def toReturn: Expr.Return[T] = Expr.Return[T](this)
+
+  def :=:(name: Symbol): Expr[Expr.Ref[T]] = Expr.Assign[T](Expr.Ref[T](name.name, boxedValue), this)
 }
 
 object Expr {
-  case class Ref[T <: types.Type](name: String) extends InlineExpr[T] {
-    override def toInlineVyper: String = name
+  case class Ref[T <: types.Type](name: String, boxedValue: T) extends InlineExpr[T] {
+    override def toVyper: String = name
+  }
+
+  case class Infix[L <: types.Type, R <: types.Type, T <: types.Type](
+    op: String,
+    left: InlineExpr[L],
+    right: InlineExpr[R],
+    boxedValue: T
+  ) extends InlineExpr[T] {
+    override def toVyper: String = left.toVyper + s" $op " + right.toVyper
+  }
+
+  case class Assign[T <: Type](ref: Ref[T], value: InlineExpr[T]) extends Expr[Ref[T]] {
+    override def boxedValue: Ref[T] = ref
+
+    override def toVyper: String =
+      s"${ref.toVyper} = ${value.toVyper}"
   }
 
   case class Return[T <: types.Type](ret: InlineExpr[T]) extends Expr[T] {
-    override def toVyper(depth: Int): String =
-      spaces(depth) + "return "+ret.toInlineVyper
+    override def boxedValue: T = ret.boxedValue
+
+    override def toVyper: String =
+      "return " + ret.toVyper
 
   }
+
+  trait Defs {
+
+    def `++`(a: InlineExpr[uint256.type], b: InlineExpr[uint256.type]): InlineExpr[uint256.type] =
+      Infix("+", a, b, uint256)
+  }
+
+  object Defs extends Defs
 }

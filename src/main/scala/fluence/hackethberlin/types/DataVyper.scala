@@ -24,7 +24,7 @@ sealed trait LowPriorityDataVyperImplicits {
     }
 
   implicit def recDataVyper[K <: Symbol, V <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, V]] =
-    new DataVyper[FieldType[K, V]]{
+    new DataVyper[FieldType[K, V]] {
       override def toVyperDefinitions(data: FieldType[K, V]): List[String] =
         s"${wk.value.name}: ${data.toVyper}" :: Nil
     }
@@ -34,13 +34,17 @@ object DataVyper extends LowPriorityDataVyperImplicits {
 
   def apply[T](implicit dataVyper: DataVyper[T]): DataVyper[T] = dataVyper
 
-  implicit def pairDataIndexedVyper[K <: Symbol, T <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, T @@ Indexed]] =
+  implicit def pairDataIndexedVyper[K <: Symbol, T <: Type](
+    implicit wk: Witness.Aux[K]
+  ): DataVyper[FieldType[K, T @@ Indexed]] =
     new DataVyper[FieldType[K, T @@ Indexed]] {
       override def toVyperDefinitions(data: FieldType[K, T @@ Indexed]): List[String] =
         s"${wk.value.name}: indexed(${data.toVyper})" :: Nil
     }
 
-  implicit def pairDataPublicVyper[K <: Symbol, T <: Type](implicit wk: Witness.Aux[K]): DataVyper[FieldType[K, T @@ Public]] =
+  implicit def pairDataPublicVyper[K <: Symbol, T <: Type](
+    implicit wk: Witness.Aux[K]
+  ): DataVyper[FieldType[K, T @@ Public]] =
     new DataVyper[FieldType[K, T @@ Public]] {
       override def toVyperDefinitions(data: FieldType[K, T @@ Public]): List[String] =
         s"${wk.value.name}: public(${data.toVyper})" :: Nil

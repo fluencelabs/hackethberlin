@@ -3,6 +3,7 @@ package fluence.hackethberlin
 import shapeless._
 import types._
 import Decorator._
+import cats.free.Free
 import syntax.singleton._
 
 object MakeVyperApp extends App {
@@ -27,7 +28,7 @@ object MakeVyperApp extends App {
     "myFunc",
     ('addr ->> address) :: HNil,
     address
-  )(args ⇒ args.ref('addr).toReturn)
+  )(args ⇒ Free.liftF(args.ref('addr).toReturn))
 
   val recordStruct = ProductType(
     ('record_address ->> address) :: ('other_some ->> uint256) :: HNil
@@ -41,6 +42,21 @@ object MakeVyperApp extends App {
 
   println(func.toVyper)
 
-  println((`@public` @: func).toVyper)
+  val sumArgs = ProductType(('a ->> uint256) :: ('b ->> uint256) :: HNil)
+
+  import Expr.Defs._
+
+  println(
+    (
+      `@public` @:
+        sumArgs.funcDef("sum", uint256) { args ⇒
+        for {
+          c ← Free.liftF('c :=: `++`(args.ref('a), args.ref('b)))
+          d ← Free.liftF('d :=: `++`(args.ref('b), c))
+          sum ← Free.liftF[Expr, uint256.type](`++`(args.ref('a), d).toReturn)
+        } yield sum
+      }
+    ).toVyper
+  )
 
 }
