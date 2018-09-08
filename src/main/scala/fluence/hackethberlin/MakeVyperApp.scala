@@ -2,9 +2,7 @@ package fluence.hackethberlin
 
 import shapeless._
 import types._
-import record._
 import Decorator._
-import shapeless.labelled.FieldType
 import syntax.singleton._
 
 object MakeVyperApp extends App {
@@ -27,18 +25,15 @@ object MakeVyperApp extends App {
 
   val func = FuncDef(
     "myFunc",
-    ('address ->> address) :: HNil,
-    uint256
-  )
-
-
-  val strDataDef = ('address ->> address) :: HNil
+    ('addr ->> address) :: HNil,
+    address
+  )(args ⇒ args.ref('addr).toReturn)
 
   val recordStruct = new StructType(
     ('record_address ->> address) :: ('other_some ->> uint256) :: HNil
   )
 
-  println(Console.RED + recordStruct.get('other_some) + Console.RESET)
+  println(Console.RED + recordStruct.ref('other_some) + Console.RESET)
 
   println(recordStruct.toVyper)
 
