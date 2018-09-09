@@ -84,5 +84,5 @@ object MakeVyperApp extends App {
 
   implicitly[fluence.hackethberlin.types.DataVyper[shapeless.HNil]]
 
-  //println(s"MMMMMACRO\n\n ${new MyContract.Contract("abc", 123).toAST.toVyper}")
+  println(s"MMMMMACRO\n\n ${new MyContract.Contract("abc", 123).toAST.toVyper}")
 }

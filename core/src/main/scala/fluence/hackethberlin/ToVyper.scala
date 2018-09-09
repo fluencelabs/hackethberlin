@@ -48,20 +48,20 @@ object ToVyper {
 
         // fluence.hackethberlin.types.PrimitiveType with shapeless.labelled.KeyTag[l.type,fluence.hackethberlin.types.PrimitiveType]
 
-        implicit val lift: c.universe.Liftable[(Symbol, PrimitiveType)] = c.universe.Liftable[(Symbol, PrimitiveType)] {
-          case (l, r) =>
-            type wtf = fluence.hackethberlin.types.PrimitiveType with shapeless.labelled.KeyTag[
-              l.type,
-              fluence.hackethberlin.types.PrimitiveType
-            ]
-            implicit val liftWtf: c.universe.Liftable[wtf] = c.universe.Liftable[wtf] {
-              case _ => q"shapeless.labelled.field.apply(_root_.fluence.hackethberlin.types.address)"
-            }
-
-//              q"$l -> $r"
-//            q"('abc ->> $r)"
-            q"(${shapeless.syntax.singleton.mkSingletonOps(l).->>(r)})"
-        }
+//        implicit val lift: c.universe.Liftable[(Symbol, PrimitiveType)] = c.universe.Liftable[(Symbol, PrimitiveType)] {
+//          case (l, r) =>
+//            type wtf = fluence.hackethberlin.types.PrimitiveType with shapeless.labelled.KeyTag[
+//              l.type,
+//              fluence.hackethberlin.types.PrimitiveType
+//            ]
+//            implicit val liftWtf: c.universe.Liftable[wtf] = c.universe.Liftable[wtf] {
+//              case _ => q"shapeless.labelled.field.apply(_root_.fluence.hackethberlin.types.address)"
+//            }
+//
+////              q"$l -> $r"
+////            q"('abc ->> $r)"
+//            q"(${shapeless.syntax.singleton.mkSingletonOps(l).->>(r)})"
+//        }
 
         implicit val lift2: c.universe.Liftable[(String, PrimitiveType)] =
           c.universe.Liftable[(String, PrimitiveType)] {
@@ -85,15 +85,18 @@ object ToVyper {
             //(elem, acc) => q"$acc"
           )
 
-        println(params.toString())
+        println("params params " + params.toString())
 
-        c.Expr[Any](q"""
+        val expr = c.Expr[Any](q"""
           class $tpname(..$paramss) {
             def toAST = {
-             fluence.hackethberlin.FuncDef.apply("__init__", $params, fluence.hackethberlin.types.MyVoid)(fluence.hackethberlin.types.EmptyBody.get($params))
+             fluence.hackethberlin.FuncDef.apply("__init__", $params, fluence.hackethberlin.types.MyVoid())(fluence.hackethberlin.types.EmptyBody.get($params))
             }
           }
         """)
+
+        println("expr is " + expr)
+        expr
 
       case _ => c.abort(c.enclosingPosition, "Invalid annottee")
     }
