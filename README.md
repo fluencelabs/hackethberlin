@@ -58,7 +58,7 @@ def sumSome(a: uint256, b: uint256) -> uint256:
 
 ```
 
-The more sophisticated [Auction example](https://github.com/fluencelabs/hackethberlin/blob/master/src/main/scala/fluence/Auction.scala) is deployed on [Rinkeby](https://rinkeby.etherscan.io/address/0xdfe0c07c8c6bb3fd9a7fd6ee45bd2c086374f13c). Hooray!
+The more sophisticated [Auction example](https://github.com/fluencelabs/hackethberlin/blob/master/src/main/scala/fluence/Auction.scala) is deployed on [Rinkeby](https://rinkeby.etherscan.io/address/0xf24A7726eaF1337A2E8826579EA381705fe64164). Hooray!
 
 ## Future plans
 
