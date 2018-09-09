@@ -58,6 +58,7 @@ object Expr {
     boxedValue: T,
     body: () ⇒ Free[Expr, Void]
   ) extends InlineExpr[T] {
+
     def bodyVyper: String =
       body().foldMap(CodeChunk.fromExpr).run._1.toVyper(2)
     override def toVyper: String = s"$op " + right.toVyper + s":\n$bodyVyper"
@@ -87,7 +88,10 @@ object Expr {
     def `:===:`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("==", a, b, bool)
 
-    def `+:+`[A <: timestamp.type, B <: timedelta.type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[timestamp.type] =
+    def `+:+`[A <: timestamp.type, B <: timedelta.type](
+      a: InlineExpr[A],
+      b: InlineExpr[B]
+    ): InlineExpr[timestamp.type] =
       Infix("+", a, b, timestamp)
 
     def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): Free[Expr, Void.type] =
@@ -110,6 +114,7 @@ object Expr {
   }
 
   object Defs extends Defs {
+
     val predef = ProductType(
       (Symbol("block.timestamp") ->> timestamp) ::
         (Symbol("msg.value") ->> wei_value) ::

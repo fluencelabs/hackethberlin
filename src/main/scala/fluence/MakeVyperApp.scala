@@ -48,15 +48,16 @@ object MakeVyperApp extends App {
   import Expr.Defs._
 
   val f = `@public` @:
-    sumArgs.funcDef("sum", uint256) { args ⇒
+    sumArgs.funcDef("sumSome", uint256) { args ⇒
     for {
       c ← 'c :=: `++`(args.ref('a), args.ref('b))
-      _ ← `++`(args.ref('a), args.ref('b))
       d ← 'd :=: `++`(args.ref('b), c)
       _ ← d :=: c
       sum ← `++`(args.ref('a), d).toReturn
     } yield sum
   }
+
+  println(f.toVyper)
 
   val all = recordStruct :: data :: func :: f :: HNil
 
@@ -67,6 +68,5 @@ object MakeVyperApp extends App {
   println(
     func(recordStruct.ref('record_address) :: HNil).toVyper
   )
-
 //  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
 }

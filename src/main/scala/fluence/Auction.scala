@@ -7,7 +7,7 @@ import Decorator._
 import syntax.singleton._
 import cats.free.Free
 import fluence.hackethberlin.{Contract, Expr, FuncDef}
-import fluence.hackethberlin.types.{ProductType, Void, `public`}
+import fluence.hackethberlin.types.{`public`, ProductType, Void}
 import shapeless.HNil
 
 object Auction extends App {
