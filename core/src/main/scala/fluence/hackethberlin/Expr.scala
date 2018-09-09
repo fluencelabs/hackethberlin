@@ -48,6 +48,18 @@ object Expr {
     override def toInlineVyper: String = toVyper
   }
 
+  case class RightBody[R, T](
+    op: String,
+    right: InlineExpr[R],
+    boxedValue: T,
+    body: () ⇒ Free[Expr, Void]
+  ) extends InlineExpr[T] {
+    def bodyVyper: String =
+      body().foldMap(CodeChunk.fromExpr).run._1.toVyper(1)
+    override def toVyper: String = s"$op " + right.toVyper + s":\n$bodyVyper\n"
+    override def toInlineVyper: String = toVyper
+  }
+
   case class Assign[T](ref: Ref[T], value: InlineExpr[T]) extends Expr[Ref[T]] {
     override def boxedValue: Ref[T] = ref
 
@@ -68,14 +80,14 @@ object Expr {
     def `++`(a: InlineExpr[uint256.type], b: InlineExpr[uint256.type]): InlineExpr[uint256.type] =
       Infix("+", a, b, uint256)
 
-    def `==`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
+    def `:===:`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("==", a, b, bool)
 
     def `+:+`(a: InlineExpr[timestamp.type], b: InlineExpr[timedelta.type]): InlineExpr[timestamp.type] =
       Infix("+", a, b, timestamp)
 
-    def `if`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
-      Right("if", expr, bool)
+    def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): InlineExpr[Void] =
+      Right("if", expr, Void)
 
     def `not`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
       Right("not", expr, bool)
@@ -83,10 +95,10 @@ object Expr {
     def `assertt`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
       Right("assert", expr, bool)
 
-    def `<`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
+    def `<<`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("<", a, b, bool)
 
-    def `>`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
+    def `>>`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix(">", a, b, bool)
   }
 

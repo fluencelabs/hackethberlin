@@ -5,6 +5,7 @@ import hackethberlin.types._
 import shapeless._
 import Decorator._
 import cats.free.Free
+import fluence.hackethberlin.Expr.Defs
 import syntax.singleton._
 
 object MakeVyperApp extends App {
@@ -71,6 +72,18 @@ object MakeVyperApp extends App {
 }
 
 object Auction {
+  import Expr.Defs._
+
+  val predef = ProductType(
+    (Symbol("block.timestamp") ->> timestamp) ::
+      (Symbol("msg.value") ->> uint256) ::
+      (Symbol("msg.sender") ->> address) ::
+      HNil
+  )
+
+  val `block.timestamp` = predef.ref(Symbol("block.timestamp"))
+  val `msg.value` = predef.ref(Symbol("msg.value"))
+  val `msg.sender` = predef.ref(Symbol("msg.sender"))
 
   val data = ProductType(
     ('beneficiary ->> public(address)) ::
@@ -85,10 +98,9 @@ object Auction {
   val auction_start = data.ref('auction_start)
   val auction_end = data.ref('auction_end)
   val highest_bid = data.ref('highest_bid)
+  val highest_bidder = data.ref('highest_bidder)
 
   val initArgs = ProductType(('_beneficiary ->> address) :: ('_bidding_time ->> timedelta) :: HNil)
-
-  import untag._
 
   val _beneficiary = initArgs.ref('_beneficiary)
   val _bidding_time = initArgs.ref('_bidding_time)
@@ -102,19 +114,28 @@ object Auction {
     for {
       _ <- Free.pure(Void)
       _ <- beneficiary :=: _beneficiary
-//      _ <- auction_start :==: block.timestamp
-//      _ <- auction_end :==: auction_start `+:+` _bidding_time
+      _ <- auction_start :=: `block.timestamp`
+//      _ <- auction_end :=: `+:+`(auction_start, _bidding_time)
     } yield Void
   }
 
-  /*val bid = `@public` @: `@payable` @: ProductType(HNil).funcDef(
+  val bidIf: () ⇒ Free[Expr, Void] = { () =>
+    for {
+      _ <- Free.pure(Void)
+//      _ <- FuncDef.send(highest_bidder :: highest_bid :: HNil)
+    } yield Void
+  }
+
+  /*val bid = `@public` @: `@payable` @: ProductType(HNil: HList).funcDef(
     "bid",
     Void
   ) { args ⇒
     for {
-      _ <- Free.pure(Void)
-      _ <- `assertt`(block.timestamp `<` auction_end)
-      _ <- `assertt`(msg.value `>` highest_bid)
+      _ <- `assertt`(`block.timestamp` `<<` auction_end)
+      _ <- `assertt`(`msg.value` `>>` highest_bid)
+      _ <- `if`(`not`(highest_bid `:===:` `msg.value`), bidIf)
+      _ <- highest_bidder :=: `msg.sender`
+      _ <- highest_bid :=: `msg.value`
     } yield Void
   }*/
 }

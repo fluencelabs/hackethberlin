@@ -14,10 +14,6 @@ sealed trait DataVyper[T] {
 
 sealed trait LowPriorityDataVyperImplicits {
 
-  implicit object hnilDataVyper extends DataVyper[HNil] {
-    override def toVyperDefinitions(data: HNil): List[String] = Nil
-  }
-
   implicit def hlistDataVyper[H, T <: HList](implicit dh: DataVyper[H], dt: DataVyper[T]): DataVyper[H :: T] =
     new DataVyper[H :: T] {
       override def toVyperDefinitions(data: H :: T): List[String] =
@@ -48,6 +44,10 @@ sealed trait LowPriorityDataVyperImplicits {
 object DataVyper extends LowPriorityDataVyperImplicits {
 
   def apply[T](implicit dataVyper: DataVyper[T]): DataVyper[T] = dataVyper
+
+  implicit object hnilDataVyper extends DataVyper[HNil] {
+    override def toVyperDefinitions(data: HNil): List[String] = Nil
+  }
 
   implicit def pairDataIndexedVyper[K <: Symbol, T <: Type](
     implicit wk: Witness.Aux[K]
