@@ -2,10 +2,11 @@
 
 Metaprogramming for Ethereum Smart Contracts, expressed in Scala's Type System.
 
-- what is scala: functional, strictly typed, JVM, huge, banking and big data developers
-- code reuse is as simple as in javascript: everything is modular, but finally compiles to a single file
-- you can optimize workload and reuse code snippets in secure way
-- if you break something in a piece of code, you won't be able to compile it -- notice problems on early stage!
+- Unlock Smart Contracts **adoption with JVM**-based language: code them _from_ Scala or _in_ Scala
+- Smart Contracts code generator is itself **a strictly typed program**
+- Write a Contract using structs and definitions of **Crotalinae DSL**, and if it compiles, you're **safe**
+- **Export** Smart Contract in [Vyper](https://github.com/ethereum/vyper) as a single plaintext and check it visually if needed
+- (TODO) Code directly in Scala: **Scala sourcecode** is translated to Crotalinae DSL with macro
 
 ## How to use it
 
