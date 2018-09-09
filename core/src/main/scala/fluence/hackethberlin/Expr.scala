@@ -15,8 +15,8 @@ sealed trait InlineExpr[T] extends Expr[T] with Expr.ToInlineVyper {
   def :=:(name: Symbol): Free[Expr, Expr.Ref[T]] =
     Free.liftF[Expr, Expr.Ref[T]](Expr.Assign[T](Expr.Ref[T](name.name, boxedValue), this))
 
-  def :==:(ref: Expr.Ref[T]): Free[Expr, Expr.Ref[T]] =
-    Free.liftF[Expr, Expr.Ref[T]](Expr.Assign[T](ref, this))
+  def :=:[J <: T](ref: Expr.Ref[J]): Free[Expr, Expr.Ref[T]] =
+    Free.liftF[Expr, Expr.Ref[T]](Expr.Assign[T](Expr.Ref[T](ref.name, ref.boxedValue), this))
 }
 
 object Expr {

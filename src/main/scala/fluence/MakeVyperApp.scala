@@ -52,7 +52,7 @@ object MakeVyperApp extends App {
     for {
       c ← 'c :=: `++`(args.ref('a), args.ref('b))
       d ← 'd :=: `++`(args.ref('b), c)
-      _ ← d :==: c
+      _ ← d :=: c
       sum ← `++`(args.ref('a), d).toReturn
     } yield sum
   }
@@ -71,6 +71,7 @@ object MakeVyperApp extends App {
 }
 
 object Auction {
+
   val data = ProductType(
     ('beneficiary ->> public(address)) ::
       ('auction_start ->> public(timestamp)) ::
@@ -99,22 +100,21 @@ object Auction {
     Void
   ) { args ⇒
     for {
-        _ <- Free.pure(Void)
-//      _ <- beneficiary :==: _beneficiary
+      _ <- Free.pure(Void)
+      _ <- beneficiary :=: _beneficiary
 //      _ <- auction_start :==: block.timestamp
 //      _ <- auction_end :==: auction_start `+:+` _bidding_time
     } yield Void
   }
 
-
-  val bid = `@public` @: `@payable` @: ProductType(HNil).funcDef(
+  /*val bid = `@public` @: `@payable` @: ProductType(HNil).funcDef(
     "bid",
     Void
   ) { args ⇒
     for {
       _ <- Free.pure(Void)
-      _ <- `assertt` (block.timestamp `<` auction_end)
-      _ <- `assertt` (msg.value `>` highest_bid)
+      _ <- `assertt`(block.timestamp `<` auction_end)
+      _ <- `assertt`(msg.value `>` highest_bid)
     } yield Void
-  }
+  }*/
 }
