@@ -7,7 +7,9 @@ import shapeless.ops.record.Selector
 
 class ProductType[D <: HList](dataDef: D, dv: DataVyper[D]) extends Type {
 
-  def ref[T <: Symbol, V <: Type](k: Witness.Aux[T])(implicit selector: Selector.Aux[D, T, V]): InlineExpr[V] =
+  import fluence.hackethberlin.untag._
+
+  def ref[T <: Symbol, V <: Type](k: Witness.Aux[T])(implicit selector: Selector.Aux[D, T, V]): Expr.Ref[V] =
     Expr.Ref[V](k.value.name, selector(dataDef))
 
   // type in type definition somewhere

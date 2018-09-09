@@ -1,12 +1,16 @@
 package fluence.hackethberlin
 
-import fluence.hackethberlin.types.{DataVyper, ProductType}
+import fluence.hackethberlin.types.{Call, DataVyper, ProductType}
 import shapeless._
+import BasisConstraint._
 import cats.free.Free
+import shapeless.ops.hlist.{Mapped, ToList}
+import shapeless.ops.record.{Keys, Selector, Values}
+import shapeless.tag.@@
 
 class FuncDef[Args <: HList, Ret <: types.Type, Params <: HList](
   name: String,
-  argsDef: ProductType[Args],
+  val argsDef: ProductType[Args],
   ret: Ret,
   body: ProductType[Args] ⇒ Free[Expr, Ret],
   decorators: Set[Decorator] = Set.empty

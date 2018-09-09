@@ -4,6 +4,7 @@ import hackethberlin._
 import hackethberlin.types._
 import shapeless._
 import Decorator._
+import cats.free.Free
 import syntax.singleton._
 
 object MakeVyperApp extends App {
@@ -51,7 +52,7 @@ object MakeVyperApp extends App {
     for {
       c ← 'c :=: `++`(args.ref('a), args.ref('b))
       d ← 'd :=: `++`(args.ref('b), c)
-      _ ← d :=: c
+      _ ← d :==: c
       sum ← `++`(args.ref('a), d).toReturn
     } yield sum
   }
@@ -67,4 +68,53 @@ object MakeVyperApp extends App {
   )
 
 //  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
+}
+
+object Auction {
+  val data = ProductType(
+    ('beneficiary ->> public(address)) ::
+      ('auction_start ->> public(timestamp)) ::
+      ('auction_end ->> public(timestamp)) ::
+      ('highest_bidder ->> `public`(address)) ::
+      ('highest_bid ->> `public`(wei_value)) ::
+      ('ended ->> public(bool)) :: HNil
+  )
+
+  val beneficiary = data.ref('beneficiary)
+  val auction_start = data.ref('auction_start)
+  val auction_end = data.ref('auction_end)
+  val highest_bid = data.ref('highest_bid)
+
+  val initArgs = ProductType(('_beneficiary ->> address) :: ('_bidding_time ->> timedelta) :: HNil)
+
+  import untag._
+
+  val _beneficiary = initArgs.ref('_beneficiary)
+  val _bidding_time = initArgs.ref('_bidding_time)
+
+  println(_beneficiary.getClass)
+
+  val init = `@public` @: initArgs.funcDef(
+    "__init__",
+    Void
+  ) { args ⇒
+    for {
+        _ <- Free.pure(Void)
+//      _ <- beneficiary :==: _beneficiary
+//      _ <- auction_start :==: block.timestamp
+//      _ <- auction_end :==: auction_start `+:+` _bidding_time
+    } yield Void
+  }
+
+
+  val bid = `@public` @: `@payable` @: ProductType(HNil).funcDef(
+    "bid",
+    Void
+  ) { args ⇒
+    for {
+      _ <- Free.pure(Void)
+      _ <- `assertt` (block.timestamp `<` auction_end)
+      _ <- `assertt` (msg.value `>` highest_bid)
+    } yield Void
+  }
 }

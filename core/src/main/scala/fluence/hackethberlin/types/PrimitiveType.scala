@@ -17,5 +17,8 @@ object PrimitiveType {
     case object uint256 extends PrimitiveType("uint256")
     case object decimal extends PrimitiveType("decimal")
     case object string extends PrimitiveType("string")
+    case object timestamp extends PrimitiveType("timestamp")
+    case object wei_value extends PrimitiveType("wei_value")
+    case object timedelta extends PrimitiveType("timedelta")
   }
 }
