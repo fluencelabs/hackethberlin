@@ -19,13 +19,16 @@ val commons = Seq(
   resolvers += Resolver.sonatypeRepo("releases"),
   scalafmtOnCompile := true,
 // see good explanation https://gist.github.com/djspiewak/7a81a395c461fd3a09a6941d4cd040f2
-  scalacOptions += "-Ypartial-unification"
+  scalacOptions += "-Ypartial-unification",
+  organization        := "one.fluence",
+  bintrayOrganization := Some("fluencelabs"),
 )
 
 commons
 
 lazy val core = project.settings(
   commons,
+  version := "0.0.1",
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "1.2.0",
     "org.typelevel" %% "cats-free" % "1.2.0",
@@ -41,6 +44,7 @@ lazy val root = project
   .dependsOn(core)
   .aggregate(core)
   .settings(
-    libraryDependencies ++= Seq("com.chuusai"   %% "shapeless" % "2.3.3"),
-    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+    libraryDependencies ++= Seq("com.chuusai" %% "shapeless" % "2.3.3"),
+    addCompilerPlugin("org.scalamacros"       % "paradise"   % "2.1.1" cross CrossVersion.full),
+    publishArtifact := false
   )
