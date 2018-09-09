@@ -1,22 +1,29 @@
 # Crotalinae
 
-Metaprogramming for Ethereum Smart Contracts, expressed in Scala's Type System.
+**Metaprogramming for Ethereum Smart Contracts, expressed in Scala's Type System.**
 
 - Unlock Smart Contracts **adoption with JVM**-based language: code them _from_ Scala or _in_ Scala
 - Smart Contracts code generator is itself **a strictly typed program**
 - Write a Contract using structs and definitions of **Crotalinae DSL**, and if it compiles, you're **safe**
 - **Export** Smart Contract in [Vyper](https://github.com/ethereum/vyper) as a single plaintext and check it visually if needed
-- (TODO) Code directly in Scala: **Scala sourcecode** is translated to Crotalinae DSL with macro
+- _(WIP)_ Code directly in Scala: **Scala sourcecode** is translated to Crotalinae DSL using macros
 
-## How to use it
+## Tech dive
 
-So you take Scala language and _Crotalinae_ DSL, built with Shapeless and Free Monads, and write the code.
+[Scala language](https://www.scala-lang.org/) is a functional programming language for JVM.
+ 
+We've noticed that we may generate Smart Contracts in a functional way: function definition is a profunctor (_Intuitively it is a bifunctor where the first argument is contravariant and the second argument is covariant._), arguments and structs are _products_, and so on.
 
-If this code compiles (in Scala), then the Smart Contract generated with this code will also compile. Constraints are validated in the type system, so you can relay on IDE support and compile time errors.
+Scala's strictly typed product exists in form of [shapeless heterogenous list](https://github.com/milessabin/shapeless). As arguments or contract data may be referenced by name, we also use Record pattern and reflect these names in type system.
 
-Finally you have composable chunks of code that can form different contracts with no copy-paste.
+To go beyond the data and function definitions, we use [Free Monad](https://typelevel.org/cats/datatypes/freemonad.html) from a category theory library for Scala named [Cats](https://github.com/typelevel/cats). It lets us _represent stateful computations as data, and run them_.
 
-Contracts are exported in [Vyper](https://github.com/ethereum/vyper) language. If you generate a lot of code, you still can check it visually.
+Running, in our case, means code generation. It is done with a _natural transformation_ from _Crotalinae DSL_ into a _Writer Monad_, which is then converted to a text.
+
+Contracts are exported in [Vyper](https://github.com/ethereum/vyper) language. 
+It's simple, very readable and comprehensive, and we really like it! 
+However, it lacks tooling for code reuse: you often need to copy-paste where, say in Solidity, you may call a function from a library. 
+With _Crotalinae_ you still have _Vyper_ sources at the end, but may take advantages of functional composition to re-use code in different contracts instead of copy-pasting it.
 
 ## Example
 
@@ -55,6 +62,7 @@ This smart contract is deployed on [Rinkeby](some link to rinkeby scanner). Hoor
 
 Of course, building EVM code from Vyper, from Scala DSL, using Free Monads and Shapeless Records, is not enough.
 
-So we're working on Macro Programming support as well. It will add one more layer of Scala code (parsed to Scala AST, used to generate Crotalinae DSL, and down on a chain).
+So we're working on Macro Programming support as well. 
+It will add one more layer of Scala code (parsed to Scala AST, used to generate Crotalinae DSL, and down on a chain).
 
 So stay tuned!
