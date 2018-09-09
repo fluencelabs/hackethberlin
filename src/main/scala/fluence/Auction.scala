@@ -13,11 +13,6 @@ import shapeless.HNil
 object Auction extends App {
   import Expr.Defs._
 
-  val `block.timestamp` = predef.ref(Symbol("block.timestamp"))
-  val `msg.value` = predef.ref(Symbol("msg.value"))
-  val `msg.sender` = predef.ref(Symbol("msg.sender"))
-  val `True` = predef.ref('True)
-
   val data = ProductType.self(
     ('beneficiary ->> public(address)) ::
       ('auction_start ->> public(timestamp)) ::
@@ -51,12 +46,6 @@ object Auction extends App {
     } yield Void
   }
 
-  val bidIf: () ⇒ Free[Expr, Void] = { () =>
-    for {
-      _ <- FuncDef.send(highest_bidder :: highest_bid :: HNil).liftF
-    } yield Void
-  }
-
   val bid = `@public` @: `@payable` @: ProductType.hNil.funcDef(
     "bid",
     Void
@@ -64,7 +53,12 @@ object Auction extends App {
     for {
       _ <- `assert`(`<<`(`block.timestamp`, auction_end))
       _ <- `assert`(`>>`(`msg.value`, highest_bid))
-      _ <- `if`(`not`(`:===:`(highest_bid, `msg.value`)), bidIf)
+      _ <- `if`(`not`(`:===:`(highest_bid, `msg.value`)), {
+        () =>
+          for {
+            _ <- FuncDef.send(highest_bidder :: highest_bid :: HNil).liftF
+          } yield Void
+      })
       _ <- highest_bidder :=: `msg.sender`
       _ <- highest_bid :=: `msg.value`
     } yield Void

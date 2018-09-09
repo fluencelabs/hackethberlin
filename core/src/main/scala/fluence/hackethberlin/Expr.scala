@@ -123,5 +123,10 @@ object Expr {
         (Symbol("False") ->> bool) ::
         HNil
     )
+
+    val `block.timestamp` = predef.ref(Symbol("block.timestamp"))
+    val `msg.value` = predef.ref(Symbol("msg.value"))
+    val `msg.sender` = predef.ref(Symbol("msg.sender"))
+    val `True` = predef.ref('True)
   }
 }
