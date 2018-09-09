@@ -1,7 +1,9 @@
 package fluence.hackethberlin
 
 import cats.free.Free
+import shapeless._
 import types._
+import syntax.singleton._
 
 sealed trait Expr[T] {
   def boxedValue: T
@@ -88,14 +90,14 @@ object Expr {
     def `+:+`[A <: timestamp.type, B <: timedelta.type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[timestamp.type] =
       Infix("+", a, b, timestamp)
 
-    def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): InlineExpr[Void] =
-      RightBody("if", expr, Void, body)
+    def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): Free[Expr, Void.type] =
+      RightBody("if", expr, Void, body).liftF
 
     def `not`[A <: bool.type](expr: InlineExpr[A]): InlineExpr[bool.type] =
       Right("not", expr, bool)
 
-    def `assertt`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
-      Right("assert", expr, bool)
+    def `assert`(expr: InlineExpr[bool.type]): Free[Expr, bool.type] =
+      Right("assert", expr, bool).liftF
 
     def `<<`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("<", a, b, bool)
@@ -107,5 +109,14 @@ object Expr {
       Infix(">", a, b, bool)
   }
 
-  object Defs extends Defs
+  object Defs extends Defs {
+    val predef = ProductType(
+      (Symbol("block.timestamp") ->> timestamp) ::
+        (Symbol("msg.value") ->> wei_value) ::
+        (Symbol("msg.sender") ->> address) ::
+        (Symbol("True") ->> bool) ::
+        (Symbol("False") ->> bool) ::
+        HNil
+    )
+  }
 }
