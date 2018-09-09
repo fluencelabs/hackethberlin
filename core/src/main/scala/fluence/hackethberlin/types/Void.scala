@@ -10,9 +10,13 @@ case object Void extends Void {
   override def toVyper: String = ""
 }
 
+case class MyVoid() extends Type {
+  override def toVyper: String = ""
+}
+
 case object EmptyBody {
 
-  def get[Args <: HList: DataVyper](args: Args): ProductType[Args] ⇒ Free[Expr, Unit] = { _ =>
-    Free.pure(Void)
+  def get[Args <: HList: DataVyper](args: Args): ProductType[Args] ⇒ Free[Expr, MyVoid] = { _ =>
+    Free.pure(MyVoid())
   }
 }

@@ -1,17 +1,13 @@
 package fluence.hackethberlin
 
-import fluence.hackethberlin.types.{PrimitiveType, _}
-import shapeless.labelled.FieldType
-import shapeless.syntax
-import shapeless.syntax.SingletonOps
-import syntax.singleton._
+import fluence.hackethberlin.types.PrimitiveType
 
 import scala.annotation.{compileTimeOnly, StaticAnnotation}
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 import scala.reflect.runtime.universe.{Tree, ValDef}
 
-@compileTimeOnly("ToVyper is compileTimeOnly")
+//@compileTimeOnly("ToVyper is compileTimeOnly")
 class ToVyper extends StaticAnnotation {
 
   def macroTransform(annottees: Any*) = macro ToVyper.impl
@@ -36,6 +32,10 @@ object ToVyper {
     annottees.headOption.map(_.tree) match {
       case Some(q"$mods class $tpname $ctorMods(..$paramss) { ..$stats }") =>
         println(s"QUASI MATCHED \nmods $mods \ntpname $tpname \nctorMods $ctorMods \nparamss $paramss \nstats$stats")
+
+        import fluence.hackethberlin.types._
+
+        implicit val auxWitness: shapeless.Witness.Aux[Symbol] = shapeless.Witness.mkWitness('auxWitness)
 
         implicit val liftPrimitive: c.universe.Liftable[PrimitiveType] = c.universe.Liftable[PrimitiveType] {
           case `address` => q"_root_.fluence.hackethberlin.types.address"
@@ -63,17 +63,34 @@ object ToVyper {
             q"(${shapeless.syntax.singleton.mkSingletonOps(l).->>(r)})"
         }
 
+        implicit val lift2: c.universe.Liftable[(String, PrimitiveType)] =
+          c.universe.Liftable[(String, PrimitiveType)] {
+            case (l, r) =>
+              type wtf = fluence.hackethberlin.types.PrimitiveType with shapeless.labelled.KeyTag[
+                l.type,
+                fluence.hackethberlin.types.PrimitiveType
+              ]
+              implicit val liftWtf: c.universe.Liftable[wtf] = c.universe.Liftable[wtf] {
+                case _ => q"shapeless.labelled.field.apply(_root_.fluence.hackethberlin.types.address)"
+              }
+
+              //q"(${shapeless.syntax.singleton.mkSingletonOps(l).->>(r)})"
+              q"shapeless.labelled.field[Symbol]($r)"
+          }
+
         val params = paramss
           .map(p => mapParam(p.asInstanceOf[ValDef]))
           .foldRight[CTree](q"shapeless.HNil")(
             (elem, acc) => q"$elem :: $acc"
+            //(elem, acc) => q"$acc"
           )
+
+        println(params.toString())
+
         c.Expr[Any](q"""
           class $tpname(..$paramss) {
             def toAST = {
-             fluence.hackethberlin.FuncDef.apply(
-                "__init__", $params
-             )(fluence.hackethberlin.types.EmptyBody.get($params))
+             fluence.hackethberlin.FuncDef.apply("__init__", $params, fluence.hackethberlin.types.MyVoid)(fluence.hackethberlin.types.EmptyBody.get($params))
             }
           }
         """)

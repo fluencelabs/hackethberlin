@@ -1,10 +1,10 @@
 package fluence
 
-import hackethberlin._
-import hackethberlin.types._
+import fluence.hackethberlin.Decorator._
+import fluence.hackethberlin._
+import fluence.hackethberlin.types._
 import shapeless._
-import Decorator._
-import syntax.singleton._
+import shapeless.syntax.singleton._
 
 object MakeVyperApp extends App {
 
@@ -65,5 +65,24 @@ object MakeVyperApp extends App {
     func(recordStruct.ref('record_address) :: HNil).toVyper
   )
 
-  println(s"MMMMMACRO\n\n ${new MyContract("abc", 123).toAST.toVyper}")
+  implicit val p: shapeless.Witness.Aux[Symbol] = shapeless.Witness.mkWitness('aaa)
+
+  implicitly[fluence.hackethberlin.types.DataVyper[shapeless.labelled.FieldType[
+    Symbol,
+    fluence.hackethberlin.types.Void
+  ] :: shapeless.labelled.FieldType[Symbol, fluence.hackethberlin.types.Void] :: shapeless.HNil]]
+
+  implicitly[Witness.Aux[Symbol]]
+
+  implicitly[fluence.hackethberlin.types.DataVyper[
+    shapeless.labelled.FieldType[Symbol, fluence.hackethberlin.types.int128.type] :: shapeless.HNil
+  ]]
+
+  /*implicitly[fluence.hackethberlin.types.DataVyper[
+    shapeless.labelled.FieldType[Symbol, fluence.hackethberlin.types.Void]
+  ]]*/
+
+  implicitly[fluence.hackethberlin.types.DataVyper[shapeless.HNil]]
+
+  //println(s"MMMMMACRO\n\n ${new MyContract.Contract("abc", 123).toAST.toVyper}")
 }
