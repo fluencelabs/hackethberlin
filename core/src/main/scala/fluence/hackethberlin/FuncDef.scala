@@ -2,11 +2,7 @@ package fluence.hackethberlin
 
 import fluence.hackethberlin.types.{DataVyper, ProductType}
 import shapeless._
-import BasisConstraint._
 import cats.free.Free
-import shapeless.ops.hlist.{Mapped, ToList}
-import shapeless.ops.record.{Keys, Selector, Values}
-import shapeless.tag.@@
 
 class FuncDef[Args <: HList, Ret <: types.Type, Params <: HList](
   name: String,
@@ -52,4 +48,17 @@ object FuncDef {
   )(implicit values: ops.record.Values.Aux[Args, _Values]): FuncDef[Args, types.Void, mapped.Out] =
     new FuncDef(name, ProductType(argsDef), types.Void, args ⇒ body(args).map(_ ⇒ types.Void))
 
+  import types._
+  import syntax.singleton._
+
+  val send = {
+    ProductType(('_addr ->> address) :: ('_money ->> wei_value) :: HNil).funcDef(
+      "send",
+      Void
+    ) { args ⇒
+      for {
+        _ <- Free.pure(Void)
+      } yield Void
+    }
+  }
 }
