@@ -64,7 +64,6 @@ The more sophisticated [Auction example](https://github.com/fluencelabs/hackethb
 
 Of course, building EVM code from Vyper, from Scala DSL, using Free Monads and Shapeless Records, is not enough.
 
-So we're working on Macro Programming support as well. 
-It will add one more layer of Scala code (parsed to Scala AST, used to generate Crotalinae DSL, and down on a chain).
+So we're working on Macro Programming support as well, so you can write your contracts in a less crazy, more usual Scala and still get all safety advantages. It will add one more layer of Scala code: Scala -> Scala AST (macro) -> Crotalinae DSL -> Vyper.
 
 So stay tuned!
