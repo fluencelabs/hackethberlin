@@ -5,10 +5,10 @@ import fluence.hackethberlin.{Expr, FuncDef, InlineExpr}
 import shapeless._
 import shapeless.ops.record.Selector
 
-class ProductType[D <: HList](dataDef: D, dv: DataVyper[D]) extends Type {
+class ProductType[D <: HList](dataDef: D, refPrefix: String, dv: DataVyper[D]) extends Type {
 
   def ref[T <: Symbol, V <: Type](k: Witness.Aux[T])(implicit selector: Selector.Aux[D, T, V]): Expr.Ref[V] =
-    Expr.Ref[V](k.value.name, selector(dataDef))
+    Expr.Ref[V](refPrefix + k.value.name, selector(dataDef))
 
   // type in type definition somewhere
   override def toVyper: String =
@@ -35,7 +35,10 @@ class ProductType[D <: HList](dataDef: D, dv: DataVyper[D]) extends Type {
 object ProductType {
 
   def apply[D <: HList](dataDef: D)(implicit dv: DataVyper[D]): ProductType[D] =
-    new ProductType[D](dataDef, dv)
+    new ProductType[D](dataDef, "", dv)
+
+  def self[D <: HList](dataDef: D)(implicit dv: DataVyper[D]): ProductType[D] =
+    new ProductType[D](dataDef, "self.", dv)
 
   def hNil: ProductType[HNil] = ProductType(HNil)
 }

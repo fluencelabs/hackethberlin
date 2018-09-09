@@ -87,7 +87,7 @@ object Auction extends App {
   val `msg.sender` = predef.ref(Symbol("msg.sender"))
   val `True` = predef.ref('True)
 
-  val data = ProductType(
+  val data = ProductType.self(
     ('beneficiary ->> public(address)) ::
       ('auction_start ->> public(timestamp)) ::
       ('auction_end ->> public(timestamp)) ::

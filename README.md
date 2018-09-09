@@ -2,7 +2,7 @@
 
 Metaprogramming for Ethereum Smart Contracts expressed in Scala's Type System.
 
-- Unlock Smart Contracts **adoption with JVM**-based language: code them _from_ Scala or _in_ Scala
+- Unlock Smart Contracts **adoption with a JVM**-based language: code them _from_ Scala or _in_ Scala
 - Smart Contracts code generator is itself **a strictly typed program**
 - Write a Contract using structs and definitions of **Crotalinae DSL**, and if it compiles, you're **safe**
 - **Export** Smart Contract in [Vyper](https://github.com/ethereum/vyper) as a single plaintext and check it visually if needed
