@@ -47,18 +47,4 @@ object FuncDef {
     mapped: ops.hlist.Mapped[_Values, InlineExpr]
   )(implicit values: ops.record.Values.Aux[Args, _Values]): FuncDef[Args, types.Void, mapped.Out] =
     new FuncDef(name, ProductType(argsDef), types.Void, args ⇒ body(args).map(_ ⇒ types.Void))
-
-  import types._
-  import syntax.singleton._
-
-  val send = {
-    ProductType(('_addr ->> `public`(address)) :: ('_money ->> `public`(wei_value)) :: HNil).funcDef(
-      "send",
-      Void
-    ) { args ⇒
-      for {
-        _ <- Free.pure(Void)
-      } yield Void
-    }
-  }
 }

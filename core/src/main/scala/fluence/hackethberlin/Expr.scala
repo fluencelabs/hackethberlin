@@ -115,6 +115,19 @@ object Expr {
 
   object Defs extends Defs {
 
+    import types._
+    import syntax.singleton._
+
+    val send =
+      ProductType(('_addr ->> `public`(address)) :: ('_money ->> `public`(wei_value)) :: HNil).funcDef(
+        "send",
+        Void
+      ) { args ⇒
+        for {
+          _ <- Free.pure(Void)
+        } yield Void
+      }
+
     val predef = ProductType(
       (Symbol("block.timestamp") ->> timestamp) ::
         (Symbol("msg.value") ->> wei_value) ::

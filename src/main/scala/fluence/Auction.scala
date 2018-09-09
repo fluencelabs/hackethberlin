@@ -5,7 +5,6 @@ import hackethberlin.types._
 import shapeless._
 import Decorator._
 import syntax.singleton._
-import cats.free.Free
 import fluence.hackethberlin.{Contract, Expr, FuncDef}
 import fluence.hackethberlin.types.{`public`, ProductType, Void}
 import shapeless.HNil
@@ -39,7 +38,6 @@ object Auction extends App {
     Void
   ) { args ⇒
     for {
-      _ <- Free.pure(Void)
       _ <- beneficiary :=: _beneficiary
       _ <- auction_start :=: `block.timestamp`
       _ <- auction_end :=: `+:+`(auction_start, _bidding_time)
@@ -55,9 +53,7 @@ object Auction extends App {
       _ <- `assert`(`>>`(`msg.value`, highest_bid))
       _ <- `if`(`not`(`:===:`(highest_bid, `msg.value`)), {
         () =>
-          for {
-            _ <- FuncDef.send(highest_bidder :: highest_bid :: HNil).liftF
-          } yield Void
+          send(highest_bidder :: highest_bid :: HNil).liftF.map(_ => Void)
       })
       _ <- highest_bidder :=: `msg.sender`
       _ <- highest_bid :=: `msg.value`
@@ -72,7 +68,7 @@ object Auction extends App {
       _ <- `assert`(`>=`(`block.timestamp`, auction_end))
       _ <- `assert`(`not`(ended))
       _ <- ended :=: `True`
-      _ <- FuncDef.send(beneficiary :: highest_bid :: HNil).liftF
+      _ <- send(beneficiary :: highest_bid :: HNil).liftF.map(_ => Void)
     } yield Void
   }
 
