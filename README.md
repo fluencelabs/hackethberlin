@@ -1,12 +1,12 @@
 # Crotalinae
 
-**Metaprogramming for Ethereum Smart Contracts, expressed in Scala's Type System.**
+Metaprogramming for Ethereum Smart Contracts expressed in Scala's Type System.
 
 - Unlock Smart Contracts **adoption with JVM**-based language: code them _from_ Scala or _in_ Scala
 - Smart Contracts code generator is itself **a strictly typed program**
 - Write a Contract using structs and definitions of **Crotalinae DSL**, and if it compiles, you're **safe**
 - **Export** Smart Contract in [Vyper](https://github.com/ethereum/vyper) as a single plaintext and check it visually if needed
-- _(WIP)_ Code directly in Scala: **Scala sourcecode** is translated to Crotalinae DSL using macros
+- _(WIP)_ Code directly in Scala: **Scala source code** is translated to Crotalinae DSL using macros
 
 ## Tech dive
 
@@ -14,7 +14,7 @@
  
 We've noticed that we may generate Smart Contracts in a functional way: function definition is a profunctor (_Intuitively it is a bifunctor where the first argument is contravariant and the second argument is covariant._), arguments and structs are _products_, and so on.
 
-Scala's strictly typed product exists in form of [shapeless heterogenous list](https://github.com/milessabin/shapeless). As arguments or contract data may be referenced by name, we also use Record pattern and reflect these names in type system.
+Scala's strictly typed product exists in form of a [shapeless heterogenous list](https://github.com/milessabin/shapeless). As arguments or contract data may be referenced by name, we also use Record pattern and reflect these names in the type system.
 
 To go beyond the data and function definitions, we use [Free Monad](https://typelevel.org/cats/datatypes/freemonad.html) from a category theory library for Scala named [Cats](https://github.com/typelevel/cats). It lets us _represent stateful computations as data, and run them_.
 
@@ -22,8 +22,8 @@ Running, in our case, means code generation. It is done with a _natural transfor
 
 Contracts are exported in [Vyper](https://github.com/ethereum/vyper) language. 
 It's simple, very readable and comprehensive, and we really like it! 
-However, it lacks tooling for code reuse: you often need to copy-paste where, say in Solidity, you may call a function from a library. 
-With _Crotalinae_ you still have _Vyper_ sources at the end, but may take advantages of functional composition to re-use code in different contracts instead of copy-pasting it.
+However, it lacks tools for code reuse: you often need to copy-paste where, say in Solidity, you may call a function from a library. 
+With _Crotalinae_ you still have _Vyper_ sources at the end, but may take advantages of the functional composition to re-use code in different contracts instead of copy-pasting it.
 
 ## Example
 
