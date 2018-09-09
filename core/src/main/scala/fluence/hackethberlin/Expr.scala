@@ -12,6 +12,8 @@ sealed trait Expr[T] {
 sealed trait InlineExpr[T] extends Expr[T] with Expr.ToInlineVyper {
   def toReturn: Free[Expr, T] = Free liftF Expr.Return[T](this)
 
+  def liftF: Free[Expr, T] = Free liftF this
+
   def :=:(name: Symbol): Free[Expr, Expr.Ref[T]] =
     Free.liftF[Expr, Expr.Ref[T]](Expr.Assign[T](Expr.Ref[T](name.name, boxedValue), this))
 
@@ -55,8 +57,8 @@ object Expr {
     body: () ⇒ Free[Expr, Void]
   ) extends InlineExpr[T] {
     def bodyVyper: String =
-      body().foldMap(CodeChunk.fromExpr).run._1.toVyper(1)
-    override def toVyper: String = s"$op " + right.toVyper + s":\n$bodyVyper\n"
+      body().foldMap(CodeChunk.fromExpr).run._1.toVyper(2)
+    override def toVyper: String = s"$op " + right.toVyper + s":\n$bodyVyper"
     override def toInlineVyper: String = toVyper
   }
 
@@ -83,13 +85,13 @@ object Expr {
     def `:===:`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("==", a, b, bool)
 
-    def `+:+`(a: InlineExpr[timestamp.type], b: InlineExpr[timedelta.type]): InlineExpr[timestamp.type] =
+    def `+:+`[A <: timestamp.type, B <: timedelta.type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[timestamp.type] =
       Infix("+", a, b, timestamp)
 
     def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): InlineExpr[Void] =
-      Right("if", expr, Void)
+      RightBody("if", expr, Void, body)
 
-    def `not`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
+    def `not`[A <: bool.type](expr: InlineExpr[A]): InlineExpr[bool.type] =
       Right("not", expr, bool)
 
     def `assertt`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
@@ -97,6 +99,9 @@ object Expr {
 
     def `<<`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("<", a, b, bool)
+
+    def `>=`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
+      Infix(">=", a, b, bool)
 
     def `>>`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix(">", a, b, bool)

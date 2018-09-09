@@ -36,4 +36,6 @@ object ProductType {
 
   def apply[D <: HList](dataDef: D)(implicit dv: DataVyper[D]): ProductType[D] =
     new ProductType[D](dataDef, dv)
+
+  def hNil: ProductType[HNil] = ProductType(HNil)
 }

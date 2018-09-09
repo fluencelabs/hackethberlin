@@ -52,7 +52,7 @@ object FuncDef {
   import syntax.singleton._
 
   val send = {
-    ProductType(('_addr ->> address) :: ('_money ->> wei_value) :: HNil).funcDef(
+    ProductType(('_addr ->> `public`(address)) :: ('_money ->> `public`(wei_value)) :: HNil).funcDef(
       "send",
       Void
     ) { args ⇒
