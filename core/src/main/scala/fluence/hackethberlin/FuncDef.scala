@@ -1,6 +1,6 @@
 package fluence.hackethberlin
 
-import fluence.hackethberlin.types.{Call, DataVyper, ProductType}
+import fluence.hackethberlin.types.{DataVyper, ProductType}
 import shapeless._
 import BasisConstraint._
 import cats.free.Free
