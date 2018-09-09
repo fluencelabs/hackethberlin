@@ -5,7 +5,7 @@ import hackethberlin.types._
 import shapeless._
 import Decorator._
 import syntax.singleton._
-import fluence.hackethberlin.{Contract, Expr, FuncDef}
+import fluence.hackethberlin.{Contract, Expr}
 import fluence.hackethberlin.types.{`public`, ProductType, Void}
 import shapeless.HNil
 
