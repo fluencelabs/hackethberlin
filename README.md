@@ -32,10 +32,11 @@ This _crazy_ Scala code:
 ```scala
 
   val f = `@public` @:
-    sumArgs.funcDef("sum", uint256) { args ⇒
+    sumArgs.funcDef("sumSome", uint256) { args ⇒
     for {
       c ← 'c :=: `++`(args.ref('a), args.ref('b))
       d ← 'd :=: `++`(args.ref('b), c)
+      _ ← d :=: c
       sum ← `++`(args.ref('a), d).toReturn
     } yield sum
   }
@@ -49,14 +50,15 @@ Compiles into this:
 ```python
 
 @public
-def sum(a: uint256, b: uint256) -> uint256:
+def sumSome(a: uint256, b: uint256) -> uint256:
   c = a + b
   d = b + c
+  d = c
   return a + d
 
 ```
 
-This smart contract is deployed on [Rinkeby](some link to rinkeby scanner). Hooray!
+The more sophisticated [Auction example](https://github.com/fluencelabs/hackethberlin/blob/master/src/main/scala/fluence/Auction.scala) is deployed on [Rinkeby](https://rinkeby.etherscan.io/address/0xdfe0c07c8c6bb3fd9a7fd6ee45bd2c086374f13c). Hooray!
 
 ## Future plans
 

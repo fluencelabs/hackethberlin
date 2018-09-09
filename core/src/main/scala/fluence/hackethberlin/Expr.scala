@@ -1,7 +1,9 @@
 package fluence.hackethberlin
 
 import cats.free.Free
+import shapeless._
 import types._
+import syntax.singleton._
 
 sealed trait Expr[T] {
   def boxedValue: T
@@ -56,6 +58,7 @@ object Expr {
     boxedValue: T,
     body: () ⇒ Free[Expr, Void]
   ) extends InlineExpr[T] {
+
     def bodyVyper: String =
       body().foldMap(CodeChunk.fromExpr).run._1.toVyper(2)
     override def toVyper: String = s"$op " + right.toVyper + s":\n$bodyVyper"
@@ -85,17 +88,20 @@ object Expr {
     def `:===:`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("==", a, b, bool)
 
-    def `+:+`[A <: timestamp.type, B <: timedelta.type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[timestamp.type] =
+    def `+:+`[A <: timestamp.type, B <: timedelta.type](
+      a: InlineExpr[A],
+      b: InlineExpr[B]
+    ): InlineExpr[timestamp.type] =
       Infix("+", a, b, timestamp)
 
-    def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): InlineExpr[Void] =
-      RightBody("if", expr, Void, body)
+    def `if`(expr: InlineExpr[bool.type], body: () ⇒ Free[Expr, Void]): Free[Expr, Void.type] =
+      RightBody("if", expr, Void, body).liftF
 
     def `not`[A <: bool.type](expr: InlineExpr[A]): InlineExpr[bool.type] =
       Right("not", expr, bool)
 
-    def `assertt`(expr: InlineExpr[bool.type]): InlineExpr[bool.type] =
-      Right("assert", expr, bool)
+    def `assert`(expr: InlineExpr[bool.type]): Free[Expr, bool.type] =
+      Right("assert", expr, bool).liftF
 
     def `<<`[A <: Type, B <: Type](a: InlineExpr[A], b: InlineExpr[B]): InlineExpr[bool.type] =
       Infix("<", a, b, bool)
@@ -107,5 +113,33 @@ object Expr {
       Infix(">", a, b, bool)
   }
 
-  object Defs extends Defs
+  object Defs extends Defs {
+
+    import types._
+    import syntax.singleton._
+
+    val send =
+      ProductType(('_addr ->> `public`(address)) :: ('_money ->> `public`(wei_value)) :: HNil).funcDef(
+        "send",
+        Void
+      ) { args ⇒
+        for {
+          _ <- Free.pure(Void)
+        } yield Void
+      }
+
+    val predef = ProductType(
+      (Symbol("block.timestamp") ->> timestamp) ::
+        (Symbol("msg.value") ->> wei_value) ::
+        (Symbol("msg.sender") ->> address) ::
+        (Symbol("True") ->> bool) ::
+        (Symbol("False") ->> bool) ::
+        HNil
+    )
+
+    val `block.timestamp` = predef.ref(Symbol("block.timestamp"))
+    val `msg.value` = predef.ref(Symbol("msg.value"))
+    val `msg.sender` = predef.ref(Symbol("msg.sender"))
+    val `True` = predef.ref('True)
+  }
 }
