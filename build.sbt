@@ -26,9 +26,10 @@ val commons = Seq(
 
 commons
 
-lazy val core = project.settings(
+lazy val crotalinae = project.in(file("core")).settings(
   commons,
-  version := "0.0.1",
+  artifact := Artifact("crotalinae"),
+  version := "0.0.4",
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "1.2.0",
     "org.typelevel" %% "cats-free" % "1.2.0",
@@ -41,8 +42,8 @@ lazy val core = project.settings(
 
 lazy val root = project
   .in(file("."))
-  .dependsOn(core)
-  .aggregate(core)
+  .dependsOn(crotalinae)
+  .aggregate(crotalinae)
   .settings(
     libraryDependencies ++= Seq("com.chuusai" %% "shapeless" % "2.3.3"),
     addCompilerPlugin("org.scalamacros"       % "paradise"   % "2.1.1" cross CrossVersion.full),

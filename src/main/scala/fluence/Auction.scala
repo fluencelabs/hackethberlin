@@ -1,7 +1,7 @@
 package fluence
 
-import hackethberlin._
-import hackethberlin.types._
+import fluence.hackethberlin._
+import fluence.hackethberlin.types._
 import shapeless._
 import Decorator._
 import syntax.singleton._
@@ -51,9 +51,8 @@ object Auction extends App {
     for {
       _ <- `assert`(`<<`(`block.timestamp`, auction_end))
       _ <- `assert`(`>>`(`msg.value`, highest_bid))
-      _ <- `if`(`not`(`:===:`(highest_bid, `msg.value`)), {
-        () =>
-          send(highest_bidder :: highest_bid :: HNil).liftF.map(_ => Void)
+      _ <- `if`(`not`(`:===:`(highest_bid, `msg.value`)), { () =>
+        send(highest_bidder :: highest_bid :: HNil).liftF.map(_ => Void)
       })
       _ <- highest_bidder :=: `msg.sender`
       _ <- highest_bid :=: `msg.value`

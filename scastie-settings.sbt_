@@ -1,0 +1,11 @@
+// use https://scastie.scala-lang.org/
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",
+  "-feature",
+  "-unchecked"
+)
+resolvers += Resolver.bintrayRepo("fluencelabs", "maven")
+libraryDependencies += "org.typelevel" %% "cats-core" % "1.2.0"
+libraryDependencies += "one.fluence" %% "crotalinae" % "0.0.4"
+libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.3"
